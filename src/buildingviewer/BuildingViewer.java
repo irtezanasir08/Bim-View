@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.awt.*;
 import java.awt.Rectangle;
@@ -157,13 +158,6 @@ public class BuildingViewer extends PApplet
 	}
 	
 	public void mouseClicked() {
-		
-		System.out.println("\n\nwalls::" + walls.size()+"\n\n\n");
-		
-		System.out.println("\n\n floors::" + floors.size()+"\n\n\n");
-		System.out.println("\n\n framing::" + framings.size()+"\n\n\n");
-		System.out.println("\n\n columns::" + columns.size()+"\n\n\n");
-
 		
 		if (cranes.size() < ui_frame.getNumCranes()) {
 			float x = mouseX * 0.2f;
@@ -398,6 +392,7 @@ public class BuildingViewer extends PApplet
 				float Z2 = getFloatValue(column_node, "Z2");
 				column.startPoint = new PVector (X1, Y1, Z1);
 				column.endPoint = new PVector (X2, Y2, Z2);
+				column.materialType = Constants.MATERIAL_TYPE_COLUMN;
 				
 				columns.add(column);
 			}
@@ -446,6 +441,7 @@ public class BuildingViewer extends PApplet
 				float Z2 = getFloatValue(framing_node, "Z2");
 				framing.startPoint = new PVector (X1, Y1, Z1);
 				framing.endPoint = new PVector (X2, Y2, Z2);
+				framing.materialType = Constants.MATERIAL_TYPE_FRAMING;
 				
 				framings.add(framing);
 			}

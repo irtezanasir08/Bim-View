@@ -3,16 +3,11 @@ package buildingviewer;
 import processing.core.PApplet;
 import processing.core.PVector;
 
-public class Column {
+public class Column extends SteelMaterial {
 
-	public int id;
-	public PVector startPoint;
-	public PVector endPoint;
-	public double height;
-	public String type;
-	
 	public Column(){}
 	
+	@Override
 	public void draw(PApplet applet)
 	{
 		applet.stroke(255, 0, 0);

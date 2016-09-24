@@ -3,16 +3,12 @@ package buildingviewer;
 import processing.core.PApplet;
 import processing.core.PVector;
 
-public class Framing {
+public class Framing extends SteelMaterial{
 	
-	public int id;
-	public PVector startPoint;
-	public PVector endPoint;
-	public double height;
-	public String type;
 	
 	public Framing(){}
 	
+	@Override
 	public void draw(PApplet applet)
 	{
 		applet.stroke(0, 0, 255);
