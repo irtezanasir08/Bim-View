@@ -53,15 +53,20 @@ public class BuildingViewer extends PApplet
 	Document framingDom = null;
 	
 	//Building object classes
-	ArrayList <Wall> walls = new ArrayList<>(); 
-	ArrayList <Floor> floors = new ArrayList<>();
-	ArrayList <Roof> roofs = new ArrayList<>();
-	ArrayList <Column> columns = new ArrayList<>();
-	ArrayList <Framing> framings = new ArrayList<>();
+	public ArrayList <Wall> walls = new ArrayList<>(); 
+	public ArrayList <Floor> floors = new ArrayList<>();
+	public ArrayList <Roof> roofs = new ArrayList<>();
+	public ArrayList <Column> columns = new ArrayList<>();
+	public ArrayList <Framing> framings = new ArrayList<>();
 
 	UIFrame ui_frame;
-	ArrayList<Crane> cranes = new ArrayList<>();
-	ArrayList<Storage> storages = new ArrayList<>();
+	public ArrayList<Crane> cranes = new ArrayList<>();
+	public ArrayList<Storage> storages = new ArrayList<>();
+	
+	//for visualization (animation)
+	Visualizer visualizer;
+	boolean animationOn = false;
+	int animationStartFrame = 0;
 	
 	public void setup() 
 	{
@@ -69,6 +74,7 @@ public class BuildingViewer extends PApplet
 		//size(1324, 576, OPENGL);
 		size (1240, 840, P3D);  
 		scene = new Scene(this);
+		this.frameRate(30);
 		//scene.setGridIsDrawn(true);
 		//scene.setAxisIsDrawn(true);		
 
@@ -90,8 +96,9 @@ public class BuildingViewer extends PApplet
 		get_column_info();	
 		get_framing_info();
 		
+		//predefined crane number and locations
 		Crane crane1 = new Crane (120, -200);
-		Crane crane2 = new Crane (150, -100);
+		Crane crane2 = new Crane (180, -100);
 		Crane crane3 = new Crane (-50, -200);
 		Crane crane4 = new Crane (-80, -20);
 		Crane crane5 = new Crane (100, 10);
@@ -102,6 +109,7 @@ public class BuildingViewer extends PApplet
 		cranes.add(crane4);
 		cranes.add(crane5);
 		
+		//predefined material storage number and locations
 		Storage storage1 = new Storage(-70, 50);
 		Storage storage2 = new Storage(130, -100);
 		Storage storage3 = new Storage(-30, -80);
@@ -112,10 +120,13 @@ public class BuildingViewer extends PApplet
 		ui_frame = new UIFrame();
 		
 		
+		visualizer = new Visualizer (this);
+		
 	}
 
 	public void draw() 
 	{
+		System.out.println(this.frameCount);
 		//view setting
 		background(255, 255, 255, 65);
 		directionalLight(192, 160, 128, 0, -1000, 100f);
@@ -128,34 +139,35 @@ public class BuildingViewer extends PApplet
 		
 		
 		//draw building geometry
-		for (int i = 0; i < walls.size(); i++)
-		{
-			walls.get(i).draw(this);
-		}
-		
-				
-		for (int i = 0; i < floors.size(); i++)
-		{
-			floors.get(i).draw(this);
-		}
-		
-		for (int i = 0; i < columns.size(); i++)
-		{
-			columns.get(i).draw(this);
-		}
-		
-		for (int i = 0; i < framings.size(); i++)
-		{
-			framings.get(i).draw(this);
-		}		
-		
-		this.ellipse(mouseX, mouseY, 3, 3);
+		walls.forEach(wall -> wall.draw(this));
+		floors.forEach(floor -> floor.draw(this));
+		columns.forEach(column -> column.draw(this));
+		framings.forEach(framing -> framing.draw(this));
 		
 		// draw cranes and storage
 		cranes.forEach(crane -> crane.draw(this));
 		storages.forEach(storage -> storage.draw(this));
 		
+		//mouse location
+		this.ellipse(mouseX, mouseY, 3, 3);
+		
+		if (animationOn)
+		{
+			visualizer.showAnimation();
+		}
+		
+		
 	}
+	
+	public void keyReleased()
+	{
+		if (key == '1')
+		{
+			this.animationOn = !animationOn;
+			this.animationStartFrame = this.frameCount;
+		}
+	}
+		
 	
 	public void mouseClicked() {
 		
