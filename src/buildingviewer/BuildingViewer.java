@@ -68,6 +68,7 @@ public class BuildingViewer extends PApplet
 	boolean animationOn = false;
 	int animationStartFrame = 0;
 	
+	
 	public void setup() 
 	{
 		//set up scene
@@ -119,6 +120,7 @@ public class BuildingViewer extends PApplet
 		storages.add(storage3);
 //		ui_frame = new UIFrame();
 		
+		assignSchedulesForCranes();
 		
 		visualizer = new Visualizer (this);
 		
@@ -484,6 +486,19 @@ public class BuildingViewer extends PApplet
 	private float getFloatValue(Element ele, String tagName) {
 		//in production application you would catch the exception
 		return Float.parseFloat (getTextValue(ele,tagName));
+	}
+	
+	private void assignSchedulesForCranes() {
+		
+		List<SteelMaterial> materialList = new ArrayList<>();
+		materialList.addAll(columns);
+		
+		ScheduleGenerator scheduleGenerator = new ScheduleGenerator();
+		List<List<SteelMaterial>> schedule = scheduleGenerator.getSchedule(cranes.size(), materialList);
+		
+		for (int i = 0; i < cranes.size(); i++) {
+			cranes.get(i).setSchedule(schedule.get(i));
+		}
 	}
 	
 	
