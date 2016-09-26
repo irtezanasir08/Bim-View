@@ -59,7 +59,7 @@ public class BuildingViewer extends PApplet
 	public ArrayList <Column> columns = new ArrayList<>();
 	public ArrayList <Framing> framings = new ArrayList<>();
 
-	UIFrame ui_frame;
+//	UIFrame ui_frame;
 	public ArrayList<Crane> cranes = new ArrayList<>();
 	public ArrayList<Storage> storages = new ArrayList<>();
 	
@@ -117,7 +117,7 @@ public class BuildingViewer extends PApplet
 		storages.add(storage1);
 		storages.add(storage2);
 		storages.add(storage3);
-		ui_frame = new UIFrame();
+//		ui_frame = new UIFrame();
 		
 		
 		visualizer = new Visualizer (this);
@@ -169,25 +169,23 @@ public class BuildingViewer extends PApplet
 	}
 		
 	
-	public void mouseClicked() {
-		
-		if (cranes.size() < ui_frame.getNumCranes()) {
-			float x = mouseX * 0.2f;
-			float y = mouseY * 0.2f;
-			cranes.add(new Crane(x, y));
-			System.out.println("Crane " + cranes.size() + " location: " + x + ", " + y);
-			redraw();
-		}
-		else if (storages.size() < ui_frame.getNumStorage()) {
-			float x = mouseX * 0.2f;
-			float y = mouseY * 0.2f;
-			storages.add(new Storage(x, y));
-			System.out.println("Storage " + storages.size() + " location: " + x + ", " + y);
-			redraw();
-			
-		}
-			
-	}
+//	public void mouseClicked() {
+//		
+//		if (cranes.size() < ui_frame.getNumCranes()) {
+//			float x = mouseX * 0.2f;
+//			float y = mouseY * 0.2f;
+//			cranes.add(new Crane(x, y));
+//			System.out.println("Crane " + cranes.size() + " location: " + x + ", " + y);
+//			redraw();
+//		}
+//		else if (storages.size() < ui_frame.getNumStorage()) {
+//			float x = mouseX * 0.2f;
+//			float y = mouseY * 0.2f;
+//			storages.add(new Storage(x, y));
+//			System.out.println("Storage " + storages.size() + " location: " + x + ", " + y);
+//			redraw();	
+//		}		
+//	}
 	
 	private void get_simple_wall_info()
 	{
