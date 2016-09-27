@@ -1,15 +1,14 @@
 package buildingviewer;
 
 import processing.core.PApplet;
+import processing.core.PVector;
 
 public class Storage {
 	
-	float xLocation;
-	float yLocation;
+	PVector location;
 	
 	public Storage(float x, float y) {
-		xLocation = x;
-		yLocation = y;
+		location = new PVector(x, y, 100);
 	}
 	
 	public void draw(PApplet applet) {
@@ -18,11 +17,11 @@ public class Storage {
 		applet.strokeWeight(10);
 		
 		applet.beginShape();
-		applet.vertex(xLocation - 20, yLocation - 20, 100);
-		applet.vertex(xLocation - 20, yLocation + 20, 100);
-		applet.vertex(xLocation + 20, yLocation + 20, 100);
-		applet.vertex(xLocation + 20, yLocation - 20, 100);
-		applet.vertex(xLocation - 20, yLocation - 20, 100);
+		applet.vertex(location.x - 20, location.y - 20, location.z);
+		applet.vertex(location.x - 20, location.y + 20, location.z);
+		applet.vertex(location.x + 20, location.y + 20, location.z);
+		applet.vertex(location.x + 20, location.y - 20, location.z);
+		applet.vertex(location.x - 20, location.y - 20, location.z);
 		applet.endShape();
 		
 	}

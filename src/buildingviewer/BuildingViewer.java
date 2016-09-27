@@ -155,7 +155,8 @@ public class BuildingViewer extends PApplet
 		
 		if (animationOn)
 		{
-			visualizer.showAnimation();
+//			visualizer.showAnimation();
+			cranes.get(0).move(storages.get(0).location, this);
 		}
 		
 		

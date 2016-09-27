@@ -22,8 +22,8 @@ public class Visualizer {
 	public void showAnimation ()
 	{
 		//this is an example: (1) draw a line between a crane and a storage area
-		PVector loc1 = new PVector (this.viewer.cranes.get(0).xLocation, this.viewer.cranes.get(0).yLocation, 100);
-		PVector loc2 = new PVector (this.viewer.storages.get(0).xLocation, this.viewer.storages.get(0).yLocation, 100);
+		PVector loc1 = new PVector (this.viewer.cranes.get(0).location.x, this.viewer.cranes.get(0).location.y, 100);
+		PVector loc2 = new PVector (this.viewer.storages.get(0).location.x, this.viewer.storages.get(0).location.y, 100);
 		
 		PVector moving_direction = PVector.sub(loc2, loc1);
 		moving_direction.normalize();
