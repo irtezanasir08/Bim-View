@@ -13,6 +13,7 @@ public class Crane {
 	int second = 0;
 	float crane_speed = 3; //3 feet
 	int destination = 0;
+	boolean moveStatus = false;
 		
 	public Crane(float x, float y) {
 		location = new PVector(x, y, 100);
@@ -31,6 +32,14 @@ public class Crane {
 	public void addScheduleLocations(PVector newLocation) {
 		
 		scheduleLocations.add(newLocation);
+	}
+	
+	public boolean getMoveStatus() {
+		return moveStatus;
+	}
+	
+	public void toggleMoveStatus() {
+		moveStatus = !moveStatus;
 	}
 	
 	public void draw(PApplet applet) {
@@ -70,7 +79,7 @@ public class Crane {
 		
 		if (PVector.dist(hookLocation, newLocation) < 2) {
 			if (scheduleLocations.size() <= destination + 1) // stop after all scheduled materials are installed
-				viewer.toggleAnimation(); 
+				toggleMoveStatus(); 
 			else
 				destination++; // get next destination location
 		}

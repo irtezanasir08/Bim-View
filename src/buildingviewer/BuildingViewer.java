@@ -152,7 +152,10 @@ public class BuildingViewer extends PApplet
 		if (animationOn)
 		{
 			// start moving the crane
-			cranes.get(0).move(this);
+			for (Crane crane : cranes) {
+				if (crane.getMoveStatus())
+					crane.move(this);
+			}
 		}
 		
 		
@@ -162,15 +165,12 @@ public class BuildingViewer extends PApplet
 	{
 		if (key == '1')
 		{
-			toggleAnimation();
+			this.animationOn = !animationOn;
+			this.animationStartFrame = this.frameCount;
+			
+			cranes.forEach(crane -> crane.toggleMoveStatus());
 		}
-	}
-	
-	public void toggleAnimation() {
-		this.animationOn = !animationOn;
-		this.animationStartFrame = this.frameCount;
-	}
-		
+	}	
 	
 //	public void mouseClicked() {
 //		
@@ -505,7 +505,7 @@ public class BuildingViewer extends PApplet
 			// this is repeated until all materials are installed
 			// then crane hook moves back to crane location
 			for (int j = 0; j < schedule.get(i).size(); j++) {
-				cranes.get(i).addScheduleLocations(storages.get(1).location);
+				cranes.get(i).addScheduleLocations(storages.get(i % 3).location);
 				cranes.get(i).addScheduleLocations(schedule.get(i).get(j).startPoint);
 			}
 			
