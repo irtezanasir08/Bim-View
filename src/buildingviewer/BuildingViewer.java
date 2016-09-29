@@ -53,15 +53,21 @@ public class BuildingViewer extends PApplet
 	Document framingDom = null;
 	
 	//Building object classes
-	ArrayList <Wall> walls = new ArrayList<>(); 
-	ArrayList <Floor> floors = new ArrayList<>();
-	ArrayList <Roof> roofs = new ArrayList<>();
-	ArrayList <Column> columns = new ArrayList<>();
-	ArrayList <Framing> framings = new ArrayList<>();
+	public ArrayList <Wall> walls = new ArrayList<>(); 
+	public ArrayList <Floor> floors = new ArrayList<>();
+	public ArrayList <Roof> roofs = new ArrayList<>();
+	public ArrayList <Column> columns = new ArrayList<>();
+	public ArrayList <Framing> framings = new ArrayList<>();
 
-	UIFrame ui_frame;
-	ArrayList<Crane> cranes = new ArrayList<>();
-	ArrayList<Storage> storages = new ArrayList<>();
+//	UIFrame ui_frame;
+	public ArrayList<Crane> cranes = new ArrayList<>();
+	public ArrayList<Storage> storages = new ArrayList<>();
+	
+	//for visualization (animation)
+//	Visualizer visualizer;
+	boolean animationOn = false;
+	int animationStartFrame = 0;
+	
 	
 	public void setup() 
 	{
@@ -69,6 +75,7 @@ public class BuildingViewer extends PApplet
 		//size(1324, 576, OPENGL);
 		size (1240, 840, P3D);  
 		scene = new Scene(this);
+		this.frameRate(30);
 		//scene.setGridIsDrawn(true);
 		//scene.setAxisIsDrawn(true);		
 
@@ -90,8 +97,9 @@ public class BuildingViewer extends PApplet
 		get_column_info();	
 		get_framing_info();
 		
+		//predefined crane number and locations
 		Crane crane1 = new Crane (120, -200);
-		Crane crane2 = new Crane (150, -100);
+		Crane crane2 = new Crane (180, -100);
 		Crane crane3 = new Crane (-50, -200);
 		Crane crane4 = new Crane (-80, -20);
 		Crane crane5 = new Crane (100, 10);
@@ -102,6 +110,7 @@ public class BuildingViewer extends PApplet
 		cranes.add(crane4);
 		cranes.add(crane5);
 		
+		//predefined material storage number and locations
 		Storage storage1 = new Storage(-70, 50);
 		Storage storage2 = new Storage(130, -100);
 		Storage storage3 = new Storage(-30, -80);
@@ -109,13 +118,15 @@ public class BuildingViewer extends PApplet
 		storages.add(storage1);
 		storages.add(storage2);
 		storages.add(storage3);
-		ui_frame = new UIFrame();
+//		ui_frame = new UIFrame();
 		
+		assignSchedulesForCranes();
 		
 	}
 
 	public void draw() 
 	{
+		System.out.println(this.frameCount);
 		//view setting
 		background(255, 255, 255, 65);
 		directionalLight(192, 160, 128, 0, -1000, 100f);
@@ -125,57 +136,59 @@ public class BuildingViewer extends PApplet
 		directionalLight(255, 64, 0, 0.5f, -0.1f, 0.5f);
 		this.scale((float) 0.2);
 		
-		
-		
 		//draw building geometry
-		for (int i = 0; i < walls.size(); i++)
-		{
-			walls.get(i).draw(this);
-		}
-		
-				
-		for (int i = 0; i < floors.size(); i++)
-		{
-			floors.get(i).draw(this);
-		}
-		
-		for (int i = 0; i < columns.size(); i++)
-		{
-			columns.get(i).draw(this);
-		}
-		
-		for (int i = 0; i < framings.size(); i++)
-		{
-			framings.get(i).draw(this);
-		}		
-		
-		this.ellipse(mouseX, mouseY, 3, 3);
+		walls.forEach(wall -> wall.draw(this));
+		floors.forEach(floor -> floor.draw(this));
+		columns.forEach(column -> column.draw(this));
+		framings.forEach(framing -> framing.draw(this));
 		
 		// draw cranes and storage
 		cranes.forEach(crane -> crane.draw(this));
 		storages.forEach(storage -> storage.draw(this));
 		
+		//mouse location
+		this.ellipse(mouseX, mouseY, 3, 3);
+		
+		if (animationOn)
+		{
+			// start moving the crane
+			cranes.get(0).move(this);
+		}
+		
+		
 	}
 	
-	public void mouseClicked() {
-		
-		if (cranes.size() < ui_frame.getNumCranes()) {
-			float x = mouseX * 0.2f;
-			float y = mouseY * 0.2f;
-			cranes.add(new Crane(x, y));
-			System.out.println("Crane " + cranes.size() + " location: " + x + ", " + y);
-			redraw();
+	public void keyReleased()
+	{
+		if (key == '1')
+		{
+			toggleAnimation();
 		}
-		else if (storages.size() < ui_frame.getNumStorage()) {
-			float x = mouseX * 0.2f;
-			float y = mouseY * 0.2f;
-			storages.add(new Storage(x, y));
-			System.out.println("Storage " + storages.size() + " location: " + x + ", " + y);
-			redraw();
-			
-		}
-			
 	}
+	
+	public void toggleAnimation() {
+		this.animationOn = !animationOn;
+		this.animationStartFrame = this.frameCount;
+	}
+		
+	
+//	public void mouseClicked() {
+//		
+//		if (cranes.size() < ui_frame.getNumCranes()) {
+//			float x = mouseX * 0.2f;
+//			float y = mouseY * 0.2f;
+//			cranes.add(new Crane(x, y));
+//			System.out.println("Crane " + cranes.size() + " location: " + x + ", " + y);
+//			redraw();
+//		}
+//		else if (storages.size() < ui_frame.getNumStorage()) {
+//			float x = mouseX * 0.2f;
+//			float y = mouseY * 0.2f;
+//			storages.add(new Storage(x, y));
+//			System.out.println("Storage " + storages.size() + " location: " + x + ", " + y);
+//			redraw();	
+//		}		
+//	}
 	
 	private void get_simple_wall_info()
 	{
@@ -474,6 +487,30 @@ public class BuildingViewer extends PApplet
 	private float getFloatValue(Element ele, String tagName) {
 		//in production application you would catch the exception
 		return Float.parseFloat (getTextValue(ele,tagName));
+	}
+	
+	private void assignSchedulesForCranes() {
+		
+		List<SteelMaterial> materialList = new ArrayList<>();
+		materialList.addAll(columns);
+		
+		ScheduleGenerator scheduleGenerator = new ScheduleGenerator();
+		List<List<SteelMaterial>> schedule = scheduleGenerator.getSchedule(cranes.size(), materialList);
+		
+		for (int i = 0; i < cranes.size(); i++) {
+			cranes.get(i).setSchedule(schedule.get(i)); // assign schedule for each crane
+			
+			// schedule locations for moving crane hooks
+			// crane hooks move to storage location => installation location
+			// this is repeated until all materials are installed
+			// then crane hook moves back to crane location
+			for (int j = 0; j < schedule.get(i).size(); j++) {
+				cranes.get(i).addScheduleLocations(storages.get(1).location);
+				cranes.get(i).addScheduleLocations(schedule.get(i).get(j).startPoint);
+			}
+			
+			cranes.get(i).addScheduleLocations(cranes.get(i).getLocation());
+		}
 	}
 	
 	
