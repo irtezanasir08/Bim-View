@@ -64,7 +64,7 @@ public class BuildingViewer extends PApplet
 	public ArrayList<Storage> storages = new ArrayList<>();
 	
 	//for visualization (animation)
-	Visualizer visualizer;
+//	Visualizer visualizer;
 	boolean animationOn = false;
 	int animationStartFrame = 0;
 	
@@ -122,8 +122,6 @@ public class BuildingViewer extends PApplet
 		
 		assignSchedulesForCranes();
 		
-		visualizer = new Visualizer (this);
-		
 	}
 
 	public void draw() 
@@ -137,8 +135,6 @@ public class BuildingViewer extends PApplet
 		directionalLight(192, 160, 128, -1000, 0, 100f);
 		directionalLight(255, 64, 0, 0.5f, -0.1f, 0.5f);
 		this.scale((float) 0.2);
-		
-		
 		
 		//draw building geometry
 		walls.forEach(wall -> wall.draw(this));
@@ -155,8 +151,8 @@ public class BuildingViewer extends PApplet
 		
 		if (animationOn)
 		{
-//			visualizer.showAnimation();
-			cranes.get(0).move(storages.get(0).location, this);
+			// start moving the crane
+			cranes.get(0).move(this);
 		}
 		
 		
@@ -166,9 +162,13 @@ public class BuildingViewer extends PApplet
 	{
 		if (key == '1')
 		{
-			this.animationOn = !animationOn;
-			this.animationStartFrame = this.frameCount;
+			toggleAnimation();
 		}
+	}
+	
+	public void toggleAnimation() {
+		this.animationOn = !animationOn;
+		this.animationStartFrame = this.frameCount;
 	}
 		
 	
@@ -498,7 +498,18 @@ public class BuildingViewer extends PApplet
 		List<List<SteelMaterial>> schedule = scheduleGenerator.getSchedule(cranes.size(), materialList);
 		
 		for (int i = 0; i < cranes.size(); i++) {
-			cranes.get(i).setSchedule(schedule.get(i));
+			cranes.get(i).setSchedule(schedule.get(i)); // assign schedule for each crane
+			
+			// schedule locations for moving crane hooks
+			// crane hooks move to storage location => installation location
+			// this is repeated until all materials are installed
+			// then crane hook moves back to crane location
+			for (int j = 0; j < schedule.get(i).size(); j++) {
+				cranes.get(i).addScheduleLocations(storages.get(1).location);
+				cranes.get(i).addScheduleLocations(schedule.get(i).get(j).startPoint);
+			}
+			
+			cranes.get(i).addScheduleLocations(cranes.get(i).getLocation());
 		}
 	}
 	
