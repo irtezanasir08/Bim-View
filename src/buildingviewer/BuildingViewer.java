@@ -120,13 +120,13 @@ public class BuildingViewer extends PApplet
 		storages.add(storage3);
 //		ui_frame = new UIFrame();
 		
-		assignSchedulesForCranes();
+		//assignSchedulesForCranes();
 		
 	}
 
 	public void draw() 
 	{
-		System.out.println(this.frameCount);
+		//System.out.println(this.frameCount);
 		//view setting
 		background(255, 255, 255, 65);
 		directionalLight(192, 160, 128, 0, -1000, 100f);
@@ -137,9 +137,9 @@ public class BuildingViewer extends PApplet
 		this.scale((float) 0.2);
 		
 		//draw building geometry
-		walls.forEach(wall -> wall.draw(this));
-		floors.forEach(floor -> floor.draw(this));
-		columns.forEach(column -> column.draw(this));
+		//walls.forEach(wall -> wall.draw(this));
+		//floors.forEach(floor -> floor.draw(this));
+		//columns.forEach(column -> column.draw(this));
 		framings.forEach(framing -> framing.draw(this));
 		
 		// draw cranes and storage
@@ -172,8 +172,30 @@ public class BuildingViewer extends PApplet
 	}
 		
 	
-//	public void mouseClicked() {
-//		
+	public void mouseClicked() {
+	
+		List<SteelMaterial> mats = new ArrayList<>();
+		
+		for (Column col : columns) {
+			mats.add(col);
+		}
+		for (Framing fra : framings) {
+			mats.add(fra);
+		}
+		System.out.println("columns:" + columns.size() + "\n" + "Fr: " + framings.size());
+		List<List<SteelMaterial>> schedule = new ScheduleGenerator().getSchedule(5, mats);
+		
+		for (List<SteelMaterial> list : schedule) {
+			for (SteelMaterial steelMaterial : list) {
+				//System.out.print(" " + steelMaterial.id + " " + steelMaterial.materialType + " ");
+			}
+			//System.out.println("\n");
+			//System.out.println(list.size());
+		}
+		
+		
+		
+		//new ScheduleGenerator ().getSchedule(1, mats);
 //		if (cranes.size() < ui_frame.getNumCranes()) {
 //			float x = mouseX * 0.2f;
 //			float y = mouseY * 0.2f;
@@ -188,7 +210,7 @@ public class BuildingViewer extends PApplet
 //			System.out.println("Storage " + storages.size() + " location: " + x + ", " + y);
 //			redraw();	
 //		}		
-//	}
+	}
 	
 	private void get_simple_wall_info()
 	{
