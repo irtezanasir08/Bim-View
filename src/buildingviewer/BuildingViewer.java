@@ -2,21 +2,17 @@ package buildingviewer;
 
 import java.io.File;
 import java.io.IOException;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Date;
+//import java.text.DateFormat;
+//import java.text.ParseException;
+//import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
-import java.awt.*;
-import java.awt.Rectangle;
-import java.awt.event.*;
+//import java.awt.*;
+//import java.awt.Rectangle;
+//import java.awt.event.*;
 
-import javax.swing.*;
-import javax.swing.event.*;
+//import javax.swing.*;
+//import javax.swing.event.*;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -98,11 +94,11 @@ public class BuildingViewer extends PApplet
 		get_framing_info();
 		
 		//predefined crane number and locations
-		Crane crane1 = new Crane (120, -200);
-		Crane crane2 = new Crane (180, -100);
-		Crane crane3 = new Crane (-50, -200);
-		Crane crane4 = new Crane (-80, -20);
-		Crane crane5 = new Crane (100, 10);
+		Crane crane1 = new Crane (120, -200, 1);
+		Crane crane2 = new Crane (180, -100, 2);
+		Crane crane3 = new Crane (-50, -200, 3);
+		Crane crane4 = new Crane (-80, -20, 4);
+		Crane crane5 = new Crane (100, 10, 5);
 		
 		cranes.add(crane1);
 		cranes.add(crane2);
@@ -111,9 +107,9 @@ public class BuildingViewer extends PApplet
 		cranes.add(crane5);
 		
 		//predefined material storage number and locations
-		Storage storage1 = new Storage(-70, 50);
-		Storage storage2 = new Storage(130, -100);
-		Storage storage3 = new Storage(-30, -80);
+		Storage storage1 = new Storage(-70, 50, 1);
+		Storage storage2 = new Storage(130, -100, 2);
+		Storage storage3 = new Storage(-30, -80, 3);
 		
 		storages.add(storage1);
 		storages.add(storage2);
@@ -151,10 +147,27 @@ public class BuildingViewer extends PApplet
 		
 		if (animationOn)
 		{
-			// start moving the crane
 			for (Crane crane : cranes) {
-				if (crane.getMoveStatus())
-					crane.move(this);
+				
+				switch(crane.getStatus()) {
+				
+					case Constants.CRANE_MOVE:
+						crane.move(this);
+						break;
+						
+					case Constants.PICK_UP_MATERIAL:
+						crane.wait(this, 10);
+						break;
+						
+					case Constants.PUT_DOWN_MATERIAL:
+						crane.wait(this, 5);
+						break;
+						
+					case Constants.INSTALL:
+						crane.wait(this, 10);
+						break;
+					
+				}
 			}
 		}
 		
@@ -168,9 +181,47 @@ public class BuildingViewer extends PApplet
 			this.animationOn = !animationOn;
 			this.animationStartFrame = this.frameCount;
 			
-			cranes.forEach(crane -> crane.toggleMoveStatus());
+			cranes.forEach(crane -> crane.setStatus(Constants.CRANE_MOVE));
 		}
 	}	
+	
+	private void assignSchedulesForCranes() {
+		
+		List<SteelMaterial> materialList = new ArrayList<>();
+		materialList.addAll(columns);
+		materialList.addAll(framings);
+		
+		ScheduleGenerator scheduleGenerator = new ScheduleGenerator();
+		List<List<SteelMaterial>> schedule = scheduleGenerator.getSchedule(cranes.size(), materialList);
+		
+		for (int i = 0; i < cranes.size(); i++) {
+			cranes.get(i).setSchedule(schedule.get(i)); // assign schedule for each crane
+			
+			// schedule locations for moving crane hooks
+			// crane hooks move to storage location => installation location
+			// this is repeated until all materials are installed
+			// then crane hook moves back to crane location
+			for (int j = 0; j < schedule.get(i).size(); j++) {
+				PVector instalLocation = schedule.get(i).get(j).startPoint;
+				cranes.get(i).addScheduleLocations(getNearestStorage(instalLocation).location);
+				cranes.get(i).addScheduleLocations(instalLocation);
+			}
+			
+			cranes.get(i).addScheduleLocations(cranes.get(i).getLocation());
+		}
+	}
+	
+	// return storage that is nearest to the installation location
+	private Storage getNearestStorage(PVector instalLocation) {
+		
+		List<Float> distance = new ArrayList<>();
+		
+		for (Storage storage : storages) {
+			distance.add(PVector.dist(instalLocation, storage.location));
+		}
+		
+		return storages.get(distance.indexOf(Collections.min(distance)));
+	}
 	
 //	public void mouseClicked() {
 //		
@@ -487,30 +538,6 @@ public class BuildingViewer extends PApplet
 	private float getFloatValue(Element ele, String tagName) {
 		//in production application you would catch the exception
 		return Float.parseFloat (getTextValue(ele,tagName));
-	}
-	
-	private void assignSchedulesForCranes() {
-		
-		List<SteelMaterial> materialList = new ArrayList<>();
-		materialList.addAll(columns);
-		
-		ScheduleGenerator scheduleGenerator = new ScheduleGenerator();
-		List<List<SteelMaterial>> schedule = scheduleGenerator.getSchedule(cranes.size(), materialList);
-		
-		for (int i = 0; i < cranes.size(); i++) {
-			cranes.get(i).setSchedule(schedule.get(i)); // assign schedule for each crane
-			
-			// schedule locations for moving crane hooks
-			// crane hooks move to storage location => installation location
-			// this is repeated until all materials are installed
-			// then crane hook moves back to crane location
-			for (int j = 0; j < schedule.get(i).size(); j++) {
-				cranes.get(i).addScheduleLocations(storages.get(i % 3).location);
-				cranes.get(i).addScheduleLocations(schedule.get(i).get(j).startPoint);
-			}
-			
-			cranes.get(i).addScheduleLocations(cranes.get(i).getLocation());
-		}
 	}
 	
 	

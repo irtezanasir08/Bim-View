@@ -5,9 +5,11 @@ import processing.core.PVector;
 
 public class Storage {
 	
+	int ID;
 	PVector location;
 	
-	public Storage(float x, float y) {
+	public Storage(float x, float y, int id) {
+		ID = id;
 		location = new PVector(x, y, 100);
 	}
 	

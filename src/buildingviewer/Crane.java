@@ -6,6 +6,7 @@ import processing.core.*;
 
 public class Crane {
 	
+	int ID;	
 	PVector location;
 	PVector hookLocation;
 	List<SteelMaterial> schedule;
@@ -13,9 +14,11 @@ public class Crane {
 	int second = 0;
 	float crane_speed = 3; //3 feet
 	int destination = 0;
-	boolean moveStatus = false;
+	int waitStartTime = 0;
+	int status = Constants.CRANE_STOP;
 		
-	public Crane(float x, float y) {
+	public Crane(float x, float y, int id) {
+		ID = id;
 		location = new PVector(x, y, 100);
 		hookLocation = location;
 		scheduleLocations = new ArrayList<>();
@@ -34,12 +37,12 @@ public class Crane {
 		scheduleLocations.add(newLocation);
 	}
 	
-	public boolean getMoveStatus() {
-		return moveStatus;
+	public int getStatus() {
+		return status;
 	}
 	
-	public void toggleMoveStatus() {
-		moveStatus = !moveStatus;
+	public void setStatus(int status) {
+		this.status = status;
 	}
 	
 	public void draw(PApplet applet) {
@@ -70,19 +73,49 @@ public class Crane {
 		PVector moving_direction = PVector.sub(newLocation, hookLocation);
 		moving_direction.normalize();
 		
-		if ((viewer.frameCount - viewer.animationStartFrame) % 10 == 0)
-		{
+		if ((viewer.frameCount - viewer.animationStartFrame) % 10 == 0) {
 			second = second + 1;
 			hookLocation = new PVector (hookLocation.x + crane_speed * moving_direction.x, hookLocation.y + crane_speed * moving_direction.y, hookLocation.z);
 		}
-		System.out.println(second + " seconds: " + hookLocation.toString());
+//		System.out.println(second + " seconds: " + hookLocation.toString());
 		
 		if (PVector.dist(hookLocation, newLocation) < 2) {
-			if (scheduleLocations.size() <= destination + 1) // stop after all scheduled materials are installed
-				toggleMoveStatus(); 
-			else
-				destination++; // get next destination location
+			
+			if (destination == scheduleLocations.size() - 1) {
+				status = Constants.CRANE_STOP;
+				System.out.println(second + " seconds: Crane " + ID + " stopped.");
+			} else {
+				waitStartTime = second;
+				
+				if (destination % 2 == 0) {
+					status = Constants.PICK_UP_MATERIAL;
+					System.out.println(second + " seconds: Crane " + ID + " picking up material from storage.");
+				} else {
+					status = Constants.PUT_DOWN_MATERIAL;
+					System.out.println(second + " seconds: Crane " + ID + " dropping material at install location.");
+				}
+			}
 		}
 	}
+	
+	public void wait(BuildingViewer viewer, int waitTime) {
+		
+		if ((viewer.frameCount - viewer.animationStartFrame) % 10 == 0) {			
+			second = second + 1;
+			
+			if (second - waitStartTime == waitTime) {				
+				if (status == Constants.PUT_DOWN_MATERIAL) {
+					status = Constants.INSTALL;
+					waitStartTime = second;
+					System.out.println(second + " seconds: Crane " + ID + " installing steel.");
+				} else {
+					destination++;
+					status = Constants.CRANE_MOVE;
+					System.out.println(second + " seconds: Crane " + ID + " start moving.");
+				}				
+			}
+		}
+	}
+	
 
 }
