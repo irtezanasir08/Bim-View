@@ -63,7 +63,7 @@ public class BuildingViewer extends PApplet
 //	Visualizer visualizer;
 	boolean animationOn = false;
 	int animationStartFrame = 0;
-	
+	int changeCode = -1;
 	
 	public void setup() 
 	{
